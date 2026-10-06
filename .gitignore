@@ -3,3 +3,4 @@ node_modules/
 *.log
 coverage/
 db/*.sql
+.DS_Store
