@@ -1,5 +1,6 @@
 const MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 20;
+const MAX_LISTING_ID_LENGTH = 20;
 
 const SELECT_COLUMNS = [
   "L_ListingID",
@@ -27,6 +28,133 @@ const SELECT_COLUMNS = [
   "PropertySubTypeAdditional",
   "StructureType",
 ].join(", ");
+
+const DETAIL_COLUMNS = [
+  "Appliances",
+  "ArchitecturalStyle",
+  "AssociationAmenities",
+  "AssociationFee",
+  "AssociationFee2Frequency",
+  "AssociationFeeFrequency",
+  "AssociationName",
+  "AttachedGarageYN",
+  "BackOnMarketDate",
+  "CoListAgentFullName",
+  "CommonInterest",
+  "CommonWalls",
+  "CommunityFeatures",
+  "Cooling",
+  "CountrySubdivision",
+  "CountyOrParish",
+  "CumulativeDaysOnMarket",
+  "DaysOnMarket",
+  "DaysOnMarketReplicationDate",
+  "Disclosures",
+  "ElevationUnits",
+  "EntryLocation",
+  "Fencing",
+  "FireplaceFeatures",
+  "FireplaceYN",
+  "Flooring",
+  "Heating",
+  "HighSchoolDistrict",
+  "InteriorFeatures",
+  "LA1_UserFirstName",
+  "LA1_UserLastName",
+  "LMD_MP_Latitude",
+  "LMD_MP_Longitude",
+  "LM_Dec_3",
+  "LM_Int2_3",
+  "LM_char10_70",
+  "LO1_OrganizationName",
+  "L_Address",
+  "L_AddressStreet",
+  "L_City",
+  "L_Class",
+  "L_DisplayId",
+  "L_Keyword1",
+  "L_Keyword2",
+  "L_Keyword5",
+  "L_Keyword7",
+  "L_ListingID",
+  "L_Photos",
+  "L_Remarks",
+  "L_State",
+  "L_Status",
+  "L_SystemPrice",
+  "L_Type_",
+  "L_Zip",
+  "ListAgentAOR",
+  "ListAgentDirectPhone",
+  "ListAgentEmail",
+  "ListAgentFullName",
+  "ListAgentKey",
+  "ListAgentOfficePhone",
+  "ListOfficeEmail",
+  "ListingContractDate",
+  "ListingTerms",
+  "LivingAreaSource",
+  "LivingAreaUnits",
+  "LotFeatures",
+  "LotSizeAcres",
+  "LotSizeArea",
+  "LotSizeSquareFeet",
+  "LotSizeUnits",
+  "MainLevelBedrooms",
+  "MajorChangeTimestamp",
+  "ModificationTimestamp",
+  "NewConstructionYN",
+  "OccupantType",
+  "OnMarketDate",
+  "OriginalEntryTimestamp",
+  "ParcelNumber",
+  "PatioAndPorchFeatures",
+  "PhotoCount",
+  "PhotoTime",
+  "PhotosChangeTimestamp",
+  "PoolFeatures",
+  "PostalCity",
+  "PreviousListPrice",
+  "PreviousStandardStatus",
+  "PriceChangeTimestamp",
+  "PropertyCondition",
+  "PropertySubTypeAdditional",
+  "Roof",
+  "RoomType",
+  "SecurityFeatures",
+  "SpaFeatures",
+  "SpecialListingConditions",
+  "StandardStatus",
+  "StatusChangeTimestamp",
+  "StructureType",
+  "SubdivisionName",
+  "TaxLot",
+  "UniversalParcelId",
+  "View",
+  "ViewYN",
+  "WaterSource",
+  "YearBuilt",
+].join(", ");
+
+function validateListingId(raw) {
+  const value = String(raw ?? "").trim();
+
+  if (value.length === 0) {
+    return { error: "Listing ID is required" };
+  }
+
+  if (!/^\d+$/.test(value)) {
+    return { error: "Listing ID must contain only digits" };
+  }
+
+  if (value.length > MAX_LISTING_ID_LENGTH) {
+    return {
+      error: `Listing ID must be ${MAX_LISTING_ID_LENGTH} digits or fewer`,
+    };
+  }
+
+  return { listingId: value };
+}
 
 function parseInteger(raw, name, { min, max }) {
   if (!/^\d+$/.test(raw)) {
@@ -172,7 +300,10 @@ function buildWhere(filters) {
 module.exports = {
   MAX_LIMIT,
   DEFAULT_LIMIT,
+  MAX_LISTING_ID_LENGTH,
   SELECT_COLUMNS,
+  DETAIL_COLUMNS,
   validate,
+  validateListingId,
   buildWhere,
 };

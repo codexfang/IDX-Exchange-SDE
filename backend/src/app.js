@@ -2,9 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const healthRouter = require("./routes/health");
 const propertiesRouter = require("./routes/properties");
+const requestLogger = require("./middleware/requestLogger");
 
 const app = express();
 
+app.use(requestLogger);
 app.use(cors());
 app.use(express.json());
 
