@@ -5,3 +5,4 @@ coverage/
 db/*.sql
 .DS_Store
 .DS_Store
+db/*.sql

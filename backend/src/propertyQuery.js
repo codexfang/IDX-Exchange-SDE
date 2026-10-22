@@ -16,6 +16,7 @@ const SELECT_COLUMNS = [
   "YearBuilt",
   "LotSizeAcres",
   "PhotoCount",
+  "L_Photos",
   "LMD_MP_Latitude",
   "LMD_MP_Longitude",
   "L_Status",
