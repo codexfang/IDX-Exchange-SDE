@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { fetchProperties } from "../api/client";
 import PropertyCard from "./PropertyCard";
+import PropertyFilters from "./PropertyFilters";
 
 const PAGE_SIZE = 20;
 
@@ -9,26 +10,39 @@ function ListingsPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchVersion, setSearchVersion] = useState(0);
+  const [activeFilters, setActiveFilters] = useState({});
+  const requestGeneration = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
+      const generation = requestGeneration.current;
       setLoading(true);
       setError(null);
 
       try {
-        const data = await fetchProperties({ limit: PAGE_SIZE, offset: 0 });
-        if (cancelled) return;
+        const params = Object.fromEntries(
+          Object.entries(activeFilters).filter(([, value]) => value !== "")
+        );
+        const data = await fetchProperties({
+          ...params,
+          limit: PAGE_SIZE,
+          offset: 0,
+        });
+        if (cancelled || generation !== requestGeneration.current) return;
         setProperties(data.results || []);
         setTotal(data.total ?? 0);
       } catch (err) {
-        if (cancelled) return;
+        if (cancelled || generation !== requestGeneration.current) return;
         setError(err.message);
         setProperties([]);
         setTotal(0);
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled && generation === requestGeneration.current) {
+          setLoading(false);
+        }
       }
     }
 
@@ -36,27 +50,26 @@ function ListingsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [activeFilters, searchVersion]);
 
-  if (loading) {
-    return (
-      <main className="page">
-        <h1>Property Listings</h1>
-        <p className="status status--loading">Loading properties…</p>
-      </main>
-    );
+  function search(filters) {
+    requestGeneration.current += 1;
+    setProperties([]);
+    setTotal(0);
+    setLoading(true);
+    setError(null);
+    setActiveFilters({ ...filters });
+    setSearchVersion((version) => version + 1);
   }
 
-  if (error) {
-    return (
-      <main className="page">
-        <h1>Property Listings</h1>
-        <div className="status status--error" role="alert">
-          <p className="status-title">Could not load properties</p>
-          <p className="status-message">{error}</p>
-        </div>
-      </main>
-    );
+  function clearFilters() {
+    requestGeneration.current += 1;
+    setProperties([]);
+    setTotal(0);
+    setLoading(true);
+    setError(null);
+    setActiveFilters({});
+    setSearchVersion((version) => version + 1);
   }
 
   return (
@@ -68,7 +81,16 @@ function ListingsPage() {
         </p>
       </header>
 
-      {properties.length === 0 ? (
+      <PropertyFilters onSearch={search} onClear={clearFilters} />
+
+      {loading ? (
+        <p className="status status--loading" role="status">Loading properties…</p>
+      ) : error ? (
+        <div className="status status--error" role="alert">
+          <p className="status-title">Could not load properties</p>
+          <p className="status-message">{error}</p>
+        </div>
+      ) : properties.length === 0 ? (
         <p className="status">No properties matched your search.</p>
       ) : (
         <div className="grid">
