@@ -206,10 +206,10 @@ h1 {
 }
 
 .filters {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-end;
   gap: 12px;
-  align-items: end;
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -220,6 +220,8 @@ h1 {
 
 .filter-field {
   display: flex;
+  flex: 1 1 0;
+  min-width: 0;
   flex-direction: column;
   gap: 6px;
 }
@@ -234,6 +236,8 @@ h1 {
 
 .filter-field input,
 .filter-field select {
+  width: 100%;
+  min-width: 0;
   height: 38px;
   padding: 0 10px;
   border: 1px solid var(--border);
@@ -251,9 +255,22 @@ h1 {
   outline-offset: 2px;
 }
 
+@media (max-width: 900px) {
+  .filters {
+    flex-wrap: wrap;
+  }
+
+  .filter-field {
+    flex: 1 1 140px;
+  }
+}
+
 .filter-actions {
   display: flex;
+  flex: 0 0 auto;
+  align-items: flex-end;
   gap: 8px;
+  white-space: nowrap;
 }
 
 .filters button {
@@ -274,7 +291,14 @@ h1 {
 
 .filters .button-secondary {
   background: #fff;
-  color: var(--accent);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.filters .button-secondary:hover {
+  border-color: var(--muted);
+  filter: none;
+  background: #f9fafb;
 }
 
 .pagination {
