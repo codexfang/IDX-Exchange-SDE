@@ -63,7 +63,7 @@ describe("ListingsPage", () => {
       expect(screen.getByText("1461 Laurel Way")).toBeInTheDocument()
     );
 
-    expect(screen.getByText("Showing 1 of 55,212 properties")).toBeInTheDocument();
+    expect(screen.getByText("Showing 1-1 of 55,212 properties")).toBeInTheDocument();
   });
 
   it("shows an error message when the API fails", async () => {
@@ -149,5 +149,66 @@ describe("ListingsPage", () => {
     await waitFor(() =>
       expect(screen.getByText(/no properties matched/i)).toBeInTheDocument()
     );
+  });
+
+  it("requests the next page with the right offset and scrolls to top", async () => {
+    window.scrollTo = jest.fn();
+    fetchProperties.mockResolvedValue({ ...sample, total: 55212 });
+
+    render(<ListingsPage />);
+    await screen.findByText("1461 Laurel Way");
+
+    await userEvent.click(screen.getByRole("button", { name: "Next" }));
+    await waitFor(() =>
+      expect(fetchProperties).toHaveBeenLastCalledWith(expect.objectContaining({ limit: 20, offset: 20 }))
+    );
+    expect(screen.getByText("Showing 21-21 of 55,212 properties")).toBeInTheDocument();
+  });
+
+  it("keeps active filters when changing pages", async () => {
+    fetchProperties.mockResolvedValue({ ...sample, total: 55212 });
+
+    render(<ListingsPage />);
+    await screen.findByText("1461 Laurel Way");
+
+    await userEvent.type(screen.getByLabelText("City"), "Irvine");
+    await userEvent.click(screen.getByRole("button", { name: "Search" }));
+    await screen.findByText("1461 Laurel Way");
+
+    await userEvent.click(screen.getByRole("button", { name: "Next" }));
+    await waitFor(() =>
+      expect(fetchProperties).toHaveBeenLastCalledWith(
+        expect.objectContaining({ city: "Irvine", offset: 20 })
+      )
+    );
+  });
+
+  it("resets to page 1 when new filters are applied", async () => {
+    fetchProperties.mockResolvedValue({ ...sample, total: 55212 });
+
+    render(<ListingsPage />);
+    await screen.findByText("1461 Laurel Way");
+
+    await userEvent.click(screen.getByRole("button", { name: "Next" }));
+    await waitFor(() =>
+      expect(fetchProperties).toHaveBeenLastCalledWith(expect.objectContaining({ offset: 20 }))
+    );
+
+    await userEvent.type(screen.getByLabelText("City"), "Irvine");
+    await userEvent.click(screen.getByRole("button", { name: "Search" }));
+    await waitFor(() =>
+      expect(fetchProperties).toHaveBeenLastCalledWith(
+        expect.objectContaining({ city: "Irvine", offset: 0 })
+      )
+    );
+  });
+
+  it("hides pagination when there is only one page", async () => {
+    fetchProperties.mockResolvedValue({ ...sample, total: 1 });
+
+    render(<ListingsPage />);
+    await screen.findByText("1461 Laurel Way");
+
+    expect(screen.queryByRole("navigation", { name: "Pagination" })).not.toBeInTheDocument();
   });
 });

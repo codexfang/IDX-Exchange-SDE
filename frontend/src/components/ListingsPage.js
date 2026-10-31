@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { fetchProperties } from "../api/client";
 import PropertyCard from "./PropertyCard";
 import PropertyFilters from "./PropertyFilters";
+import Pagination from "./Pagination";
 
 const PAGE_SIZE = 20;
 
@@ -12,6 +13,7 @@ function ListingsPage() {
   const [error, setError] = useState(null);
   const [searchVersion, setSearchVersion] = useState(0);
   const [activeFilters, setActiveFilters] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
   const requestGeneration = useRef(0);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ function ListingsPage() {
         const data = await fetchProperties({
           ...params,
           limit: PAGE_SIZE,
-          offset: 0,
+          offset: (currentPage - 1) * PAGE_SIZE,
         });
         if (cancelled || generation !== requestGeneration.current) return;
         setProperties(data.results || []);
@@ -50,7 +52,7 @@ function ListingsPage() {
     return () => {
       cancelled = true;
     };
-  }, [activeFilters, searchVersion]);
+  }, [activeFilters, searchVersion, currentPage]);
 
   function search(filters) {
     requestGeneration.current += 1;
@@ -58,6 +60,7 @@ function ListingsPage() {
     setTotal(0);
     setLoading(true);
     setError(null);
+    setCurrentPage(1);
     setActiveFilters({ ...filters });
     setSearchVersion((version) => version + 1);
   }
@@ -68,16 +71,28 @@ function ListingsPage() {
     setTotal(0);
     setLoading(true);
     setError(null);
+    setCurrentPage(1);
     setActiveFilters({});
     setSearchVersion((version) => version + 1);
   }
+
+  function changePage(page) {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  }
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const firstShown = (currentPage - 1) * PAGE_SIZE + 1;
+  const lastShown = firstShown + properties.length - 1;
 
   return (
     <main className="page">
       <header className="page-header">
         <h1>Property Listings</h1>
         <p className="result-count">
-          Showing {properties.length} of {total.toLocaleString("en-US")} properties
+          {properties.length > 0
+            ? `Showing ${firstShown}-${lastShown} of ${total.toLocaleString("en-US")} properties`
+            : `Showing 0 of ${total.toLocaleString("en-US")} properties`}
         </p>
       </header>
 
@@ -101,6 +116,14 @@ function ListingsPage() {
             />
           ))}
         </div>
+      )}
+
+      {!loading && !error && properties.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={changePage}
+        />
       )}
     </main>
   );
