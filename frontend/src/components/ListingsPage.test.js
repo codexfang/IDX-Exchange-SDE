@@ -1,5 +1,6 @@
 import React from "react";
 import { render, screen, waitFor, act } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import ListingsPage from "./ListingsPage";
 import userEvent from "@testing-library/user-event";
 import { fetchProperties } from "../api/client";
@@ -28,6 +29,14 @@ const sample = {
   ],
 };
 
+function renderListings() {
+  return render(
+    <MemoryRouter>
+      <ListingsPage />
+    </MemoryRouter>
+  );
+}
+
 describe("ListingsPage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -41,7 +50,7 @@ describe("ListingsPage", () => {
       })
     );
 
-    render(<ListingsPage />);
+    renderListings();
 
     expect(screen.getByText(/loading properties/i)).toBeInTheDocument();
 
@@ -57,7 +66,7 @@ describe("ListingsPage", () => {
   it("renders the property grid and the result count", async () => {
     fetchProperties.mockResolvedValue(sample);
 
-    render(<ListingsPage />);
+    renderListings();
 
     await waitFor(() =>
       expect(screen.getByText("1461 Laurel Way")).toBeInTheDocument()
@@ -69,7 +78,7 @@ describe("ListingsPage", () => {
   it("shows an error message when the API fails", async () => {
     fetchProperties.mockRejectedValue(new Error("Could not reach the server."));
 
-    render(<ListingsPage />);
+    renderListings();
 
     await waitFor(() =>
       expect(screen.getByRole("alert")).toBeInTheDocument()
@@ -85,7 +94,7 @@ describe("ListingsPage", () => {
       .mockResolvedValueOnce({ ...sample, total: 0, results: [] })
       .mockResolvedValueOnce(sample);
 
-    render(<ListingsPage />);
+    renderListings();
     await screen.findByText("1461 Laurel Way");
 
     await userEvent.type(screen.getByLabelText("City"), "Irvine");
@@ -114,7 +123,7 @@ describe("ListingsPage", () => {
       .mockResolvedValueOnce(sample)
       .mockResolvedValueOnce({ ...sample, results: [{ ...sample.results[0], id: 2, L_Address: "New Search Result" }] });
 
-    render(<ListingsPage />);
+    renderListings();
     await screen.findByText("1461 Laurel Way");
 
     await userEvent.type(screen.getByLabelText("City"), "Old City");
@@ -144,7 +153,7 @@ describe("ListingsPage", () => {
       results: [],
     });
 
-    render(<ListingsPage />);
+    renderListings();
 
     await waitFor(() =>
       expect(screen.getByText(/no properties matched/i)).toBeInTheDocument()
@@ -155,7 +164,7 @@ describe("ListingsPage", () => {
     window.scrollTo = jest.fn();
     fetchProperties.mockResolvedValue({ ...sample, total: 55212 });
 
-    render(<ListingsPage />);
+    renderListings();
     await screen.findByText("1461 Laurel Way");
 
     await userEvent.click(screen.getByRole("button", { name: "Next" }));
@@ -168,7 +177,7 @@ describe("ListingsPage", () => {
   it("keeps active filters when changing pages", async () => {
     fetchProperties.mockResolvedValue({ ...sample, total: 55212 });
 
-    render(<ListingsPage />);
+    renderListings();
     await screen.findByText("1461 Laurel Way");
 
     await userEvent.type(screen.getByLabelText("City"), "Irvine");
@@ -186,7 +195,7 @@ describe("ListingsPage", () => {
   it("resets to page 1 when new filters are applied", async () => {
     fetchProperties.mockResolvedValue({ ...sample, total: 55212 });
 
-    render(<ListingsPage />);
+    renderListings();
     await screen.findByText("1461 Laurel Way");
 
     await userEvent.click(screen.getByRole("button", { name: "Next" }));
@@ -206,7 +215,7 @@ describe("ListingsPage", () => {
   it("hides pagination when there is only one page", async () => {
     fetchProperties.mockResolvedValue({ ...sample, total: 1 });
 
-    render(<ListingsPage />);
+    renderListings();
     await screen.findByText("1461 Laurel Way");
 
     expect(screen.queryByRole("navigation", { name: "Pagination" })).not.toBeInTheDocument();

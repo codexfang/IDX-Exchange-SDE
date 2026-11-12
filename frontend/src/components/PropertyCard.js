@@ -1,41 +1,21 @@
 import React from "react";
-import { firstPhoto } from "../utils/photos";
-
-function formatPrice(value) {
-  if (value === null || value === undefined) return "Price unavailable";
-  const amount = Number(value);
-  if (!Number.isFinite(amount)) return "Price unavailable";
-  return `$${amount.toLocaleString("en-US")}`;
-}
-
-function formatBaths(value) {
-  const baths = Number(value);
-  if (!Number.isFinite(baths)) return null;
-  return Number.isInteger(baths) ? String(baths) : baths.toFixed(1);
-}
+import { Link } from "react-router-dom";
+import { formatBaths, formatCount, formatPrice } from "../utils/format";
+import PropertyImageCarousel from "./PropertyImageCarousel";
 
 function PropertyCard({ property }) {
-  const photo = firstPhoto(property.L_Photos);
   const baths = formatBaths(property.LM_Dec_3);
+  const listingId = property.L_ListingID ?? property.id;
+  const address = property.L_Address || "Address unavailable";
 
   return (
-    <article className="card">
+    <Link
+      className="card"
+      to={`/property/${encodeURIComponent(listingId)}`}
+      aria-label={`View details for ${address}`}
+    >
       <div className="card-media">
-        {photo ? (
-          <img
-            src={photo}
-            alt={property.L_Address || "Property"}
-            loading="lazy"
-            onError={(event) => {
-              event.target.style.display = "none";
-              event.target.parentElement.classList.add("card-media--broken");
-            }}
-          />
-        ) : (
-          <div className="card-media--placeholder">
-            <span>No photo available</span>
-          </div>
-        )}
+        <PropertyImageCarousel photos={property.L_Photos} alt={address} />
         {property.L_Status && (
           <span className="card-status">{property.L_Status}</span>
         )}
@@ -44,7 +24,7 @@ function PropertyCard({ property }) {
       <div className="card-body">
         <p className="card-price">{formatPrice(property.L_SystemPrice)}</p>
 
-        <h3 className="card-address">{property.L_Address || "Address unavailable"}</h3>
+        <h3 className="card-address">{address}</h3>
 
         <p className="card-location">
           {property.L_City || "Unknown city"}
@@ -60,14 +40,11 @@ function PropertyCard({ property }) {
             <strong>{baths ?? "—"}</strong> baths
           </li>
           <li>
-            <strong>
-              {property.LM_Int2_3 ? Number(property.LM_Int2_3).toLocaleString("en-US") : "—"}
-            </strong>{" "}
-            sqft
+            <strong>{formatCount(property.LM_Int2_3) ?? "—"}</strong> sqft
           </li>
         </ul>
       </div>
-    </article>
+    </Link>
   );
 }
 

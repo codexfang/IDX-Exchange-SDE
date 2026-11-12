@@ -1,9 +1,18 @@
 import React from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import ListingsPage from "./components/ListingsPage";
+import PropertyDetailPage from "./components/PropertyDetailPage";
 
 function App() {
-  return <ListingsPage />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<ListingsPage />} />
+        <Route path="/property/:id" element={<PropertyDetailPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;

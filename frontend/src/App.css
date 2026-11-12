@@ -353,3 +353,514 @@ h1 {
   padding: 0 4px;
   color: var(--muted);
 }
+
+/* ---------- Clickable cards ---------- */
+
+a.card {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+a.card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.carousel {
+  position: absolute;
+  inset: 0;
+}
+
+.carousel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 220ms ease;
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(16, 24, 40, 0.62);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 160ms ease, background 160ms ease;
+}
+
+.carousel:hover .carousel-arrow,
+.carousel-arrow:focus-visible {
+  opacity: 1;
+}
+
+.carousel-arrow:hover {
+  background: rgba(16, 24, 40, 0.85);
+}
+
+.carousel-arrow--prev {
+  left: 8px;
+}
+
+.carousel-arrow--next {
+  right: 8px;
+}
+
+.carousel-counter {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(16, 24, 40, 0.72);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+@media (hover: none) {
+  .carousel-arrow {
+    opacity: 1;
+  }
+}
+
+/* ---------- Detail page ---------- */
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 18px;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.detail-price {
+  margin: 0 0 4px;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.detail-address {
+  margin: 0 0 4px;
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.detail-location {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.detail-status {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #e7f2ff;
+  color: #0b4a94;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+.detail-side {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detail-stats,
+.detail-description,
+.detail-facts,
+.map,
+.open-houses {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+
+.detail-stats {
+  margin: 20px 0;
+}
+
+.detail-stats dl {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.detail-stats dt,
+.detail-fact-list dt {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detail-stats dd {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.detail-description,
+.detail-facts {
+  margin-bottom: 20px;
+}
+
+.detail-description h2,
+.detail-facts h2,
+.map h2,
+.open-houses h2 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+
+.detail-description p {
+  margin: 0;
+  line-height: 1.65;
+  color: #3b424c;
+  white-space: pre-line;
+}
+
+.detail-fact-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
+  margin: 0;
+}
+
+.detail-fact-list dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+}
+
+.detail-muted {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ---------- Photo gallery ---------- */
+
+.gallery {
+  margin-bottom: 4px;
+}
+
+.gallery-main {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #e9ebef;
+  overflow: hidden;
+  cursor: zoom-in;
+  box-shadow: var(--shadow);
+}
+
+.gallery-main img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.gallery-counter {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(16, 24, 40, 0.72);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.gallery-thumbs {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  padding-bottom: 4px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.gallery-thumb {
+  flex: 0 0 auto;
+  width: 92px;
+  height: 68px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #e9ebef;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 160ms ease, border-color 160ms ease;
+}
+
+.gallery-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-thumb:hover {
+  opacity: 1;
+}
+
+.gallery-thumb--active {
+  border-color: var(--accent);
+  opacity: 1;
+}
+
+.gallery-main:focus-visible,
+.gallery-thumb:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Lightbox ---------- */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(8, 11, 16, 0.92);
+}
+
+.lightbox:focus {
+  outline: none;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: min(1100px, 100%);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.lightbox-content img {
+  max-width: 100%;
+  max-height: calc(100vh - 110px);
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.lightbox-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lightbox-arrow--prev {
+  left: 8px;
+}
+
+.lightbox-arrow--next {
+  right: 8px;
+}
+
+.lightbox-counter {
+  margin: 0;
+  color: #d7dbe2;
+  font-size: 13px;
+}
+
+/* ---------- Map ---------- */
+
+.map-frame {
+  width: 100%;
+  height: 260px;
+  border: 0;
+  border-radius: 10px;
+  display: block;
+}
+
+.map-missing {
+  margin: 0 0 12px;
+  padding: 14px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: #fafbfc;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.map-directions {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.map-directions:hover {
+  background: #eaf3ff;
+}
+
+/* ---------- Open houses ---------- */
+
+.open-house-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.open-house {
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.open-house:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+.open-house-when {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.open-house-time {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.open-house-remarks {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.open-houses-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .detail-stats dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .detail-price {
+    font-size: 24px;
+  }
+
+  .detail-address {
+    font-size: 20px;
+  }
+
+  .detail-fact-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lightbox {
+    padding: 12px;
+  }
+
+  .lightbox-close {
+    top: 4px;
+    right: 4px;
+  }
+
+  .lightbox-arrow {
+    width: 36px;
+    height: 36px;
+  }
+}

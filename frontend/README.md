@@ -39,6 +39,19 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
+## Google Maps key
+
+The property detail page embeds a map with the Google Maps Embed API. Copy
+`.env.example` to `.env` and paste a key that is restricted to
+`localhost:3000` and the Maps Embed API:
+
+```
+REACT_APP_GOOGLE_MAPS_API_KEY=your_key
+```
+
+Restart `npm start` after editing `.env`. Without a key the detail page still
+works; it shows a note in place of the map and keeps the Get Directions link.
+
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
