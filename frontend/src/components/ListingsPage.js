@@ -4,6 +4,7 @@ import PropertyCard from "./PropertyCard";
 import PropertyFilters from "./PropertyFilters";
 import Pagination from "./Pagination";
 import SortControls from "./SortControls";
+import FavoritesLink from "./FavoritesLink";
 
 const PAGE_SIZE = 20;
 const DEFAULT_SORT = { sortBy: null, sortOrder: null };
@@ -106,12 +107,15 @@ function ListingsPage() {
   return (
     <main className="page">
       <header className="page-header">
-        <h1>Property Listings</h1>
-        <p className="result-count">
-          {properties.length > 0
-            ? `Showing ${firstShown}-${lastShown} of ${total.toLocaleString("en-US")} properties`
-            : `Showing 0 of ${total.toLocaleString("en-US")} properties`}
-        </p>
+        <div>
+          <h1>Property Listings</h1>
+          <p className="result-count">
+            {properties.length > 0
+              ? `Showing ${firstShown}-${lastShown} of ${total.toLocaleString("en-US")} properties`
+              : `Showing 0 of ${total.toLocaleString("en-US")} properties`}
+          </p>
+        </div>
+        <FavoritesLink />
       </header>
 
       <PropertyFilters onSearch={search} onClear={clearFilters} />

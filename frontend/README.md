@@ -69,6 +69,23 @@ matches the rows you can actually order.
 Sorting reads an index per column. If price sorting feels slow on a fresh
 database, add the indexes in `backend/sql/indexes.sql`.
 
+## Favorites
+
+Each property card has a heart button, and the header links to `/favorites` with
+a count of what is saved. Favorites live in the browser: `useFavorites`
+(`src/hooks/useFavorites.js`) keeps them under the `idx.favorites` localStorage
+key, so they survive a refresh and are per device, per browser — nothing is sent
+to the API and there is no account to sign in to.
+
+A saved entry stores the card snapshot (address, price, beds, baths, square
+footage, status, photos) rather than only an id. That keeps the favorites page
+instant and lets it show properties that are no longer in the current set of
+results.
+
+One store backs every consumer, so saving from a card updates the count in the
+header and the favorites page at the same time. Changes made in another tab are
+picked up through the `storage` event.
+
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).

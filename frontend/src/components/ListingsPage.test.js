@@ -4,6 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import ListingsPage from "./ListingsPage";
 import userEvent from "@testing-library/user-event";
 import { fetchProperties } from "../api/client";
+import { clearFavorites, toggleFavorite } from "../hooks/useFavorites";
 
 jest.mock("../api/client");
 
@@ -357,6 +358,45 @@ describe("ListingsPage", () => {
         expect(fetchProperties).toHaveBeenLastCalledWith({ limit: 20, offset: 0 })
       );
       expect(screen.getByLabelText("Sort by")).toHaveValue("");
+    });
+  });
+
+  describe("favorites", () => {
+    beforeEach(() => {
+      window.localStorage.clear();
+      clearFavorites();
+      fetchProperties.mockResolvedValue({ ...sample, total: 55212 });
+    });
+
+    it("shows the saved count in the header", async () => {
+      toggleFavorite(sample.results[0]);
+      toggleFavorite({ ...sample.results[0], id: 2, L_ListingID: "222" });
+
+      renderListings();
+      await screen.findByText("1461 Laurel Way");
+
+      expect(
+        screen.getByRole("link", { name: /view favorites, 2 saved/i })
+      ).toHaveAttribute("href", "/favorites");
+    });
+
+    it("starts at zero and counts up as hearts are clicked", async () => {
+      renderListings();
+      await screen.findByText("1461 Laurel Way");
+
+      expect(
+        screen.getByRole("link", { name: /view favorites, none saved yet/i })
+      ).toBeInTheDocument();
+
+      await userEvent.click(
+        screen.getByRole("button", { name: /save 1461 Laurel Way to favorites/i })
+      );
+
+      expect(
+        screen.getByRole("link", { name: /view favorites, 1 saved/i })
+      ).toBeInTheDocument();
+      // Saving is local: it must not re-run the search.
+      expect(fetchProperties).toHaveBeenCalledTimes(1);
     });
   });
 });

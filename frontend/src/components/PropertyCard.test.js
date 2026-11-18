@@ -1,7 +1,14 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import userEvent from "@testing-library/user-event";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import PropertyCard from "./PropertyCard";
+import {
+  FAVORITES_STORAGE_KEY,
+  clearFavorites,
+  isFavorite,
+  toggleFavorite,
+} from "../hooks/useFavorites";
 
 const baseProperty = {
   id: 1,
@@ -106,5 +113,96 @@ describe("PropertyCard", () => {
   it("shows the status badge", () => {
     renderCard();
     expect(screen.getByText("Active")).toBeInTheDocument();
+  });
+
+  describe("favorite heart", () => {
+    beforeEach(() => {
+      window.localStorage.clear();
+      clearFavorites();
+    });
+
+    function renderWithPathSpy(property = baseProperty) {
+      function PathSpy() {
+        const location = useLocation();
+        return <span data-testid="path">{location.pathname}</span>;
+      }
+
+      return render(
+        <MemoryRouter initialEntries={["/"]}>
+          <PropertyCard property={property} />
+          <PathSpy />
+        </MemoryRouter>
+      );
+    }
+
+    it("shows an empty heart for a property that is not saved", () => {
+      renderCard();
+
+      const heart = screen.getByRole("button", {
+        name: /save 1461 Laurel Way to favorites/i,
+      });
+      expect(heart).toHaveAttribute("aria-pressed", "false");
+      expect(heart).toHaveTextContent("♡");
+    });
+
+    it("fills the heart and saves the property when clicked", async () => {
+      renderCard();
+
+      await userEvent.click(
+        screen.getByRole("button", { name: /save 1461 Laurel Way to favorites/i })
+      );
+
+      const heart = screen.getByRole("button", {
+        name: /remove 1461 Laurel Way from favorites/i,
+      });
+      expect(heart).toHaveAttribute("aria-pressed", "true");
+      expect(heart).toHaveTextContent("♥");
+      expect(isFavorite("1118422731")).toBe(true);
+      expect(window.localStorage.getItem(FAVORITES_STORAGE_KEY)).toContain(
+        "1118422731"
+      );
+    });
+
+    it("does not navigate to the property when the heart is clicked", async () => {
+      renderWithPathSpy();
+
+      expect(screen.getByTestId("path")).toHaveTextContent("/");
+
+      await userEvent.click(
+        screen.getByRole("button", { name: /save 1461 Laurel Way to favorites/i })
+      );
+
+      expect(screen.getByTestId("path")).toHaveTextContent("/");
+      expect(
+        screen.getByRole("link", { name: /view details for 1461 Laurel Way/i })
+      ).toHaveAttribute("href", "/property/1118422731");
+    });
+
+    it("unfavorites on a second click", async () => {
+      renderCard();
+
+      const heart = screen.getByRole("button", {
+        name: /save 1461 Laurel Way to favorites/i,
+      });
+      await userEvent.click(heart);
+      await userEvent.click(
+        screen.getByRole("button", { name: /remove 1461 Laurel Way from favorites/i })
+      );
+
+      expect(isFavorite("1118422731")).toBe(false);
+      expect(
+        screen.getByRole("button", { name: /save 1461 Laurel Way to favorites/i })
+      ).toHaveAttribute("aria-pressed", "false");
+    });
+
+    it("starts filled for a property saved on an earlier visit", () => {
+      toggleFavorite(baseProperty);
+
+      renderCard();
+
+      expect(
+        screen.getByRole("button", { name: /remove 1461 Laurel Way from favorites/i })
+      ).toHaveAttribute("aria-pressed", "true");
+    });
   });
 });
