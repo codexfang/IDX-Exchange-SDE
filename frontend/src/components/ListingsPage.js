@@ -3,8 +3,10 @@ import { fetchProperties } from "../api/client";
 import PropertyCard from "./PropertyCard";
 import PropertyFilters from "./PropertyFilters";
 import Pagination from "./Pagination";
+import SortControls from "./SortControls";
 
 const PAGE_SIZE = 20;
+const DEFAULT_SORT = { sortBy: null, sortOrder: null };
 
 function ListingsPage() {
   const [properties, setProperties] = useState([]);
@@ -14,6 +16,7 @@ function ListingsPage() {
   const [searchVersion, setSearchVersion] = useState(0);
   const [activeFilters, setActiveFilters] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
+  const [sort, setSort] = useState(DEFAULT_SORT);
   const requestGeneration = useRef(0);
 
   useEffect(() => {
@@ -32,6 +35,7 @@ function ListingsPage() {
           ...params,
           limit: PAGE_SIZE,
           offset: (currentPage - 1) * PAGE_SIZE,
+          ...(sort.sortBy ? { sortBy: sort.sortBy, sortOrder: sort.sortOrder } : {}),
         });
         if (cancelled || generation !== requestGeneration.current) return;
         setProperties(data.results || []);
@@ -52,7 +56,7 @@ function ListingsPage() {
     return () => {
       cancelled = true;
     };
-  }, [activeFilters, searchVersion, currentPage]);
+  }, [activeFilters, searchVersion, currentPage, sort]);
 
   function search(filters) {
     requestGeneration.current += 1;
@@ -61,6 +65,7 @@ function ListingsPage() {
     setLoading(true);
     setError(null);
     setCurrentPage(1);
+    setSort(DEFAULT_SORT);
     setActiveFilters({ ...filters });
     setSearchVersion((version) => version + 1);
   }
@@ -72,12 +77,25 @@ function ListingsPage() {
     setLoading(true);
     setError(null);
     setCurrentPage(1);
+    setSort(DEFAULT_SORT);
     setActiveFilters({});
     setSearchVersion((version) => version + 1);
   }
 
   function changePage(page) {
     setCurrentPage(page);
+    window.scrollTo(0, 0);
+  }
+
+  // Sorting starts a new ordering, so the old page number no longer points at
+  // anything meaningful: go back to page 1 and show the first page of the new sort.
+  function changeSort(nextSort) {
+    requestGeneration.current += 1;
+    setProperties([]);
+    setLoading(true);
+    setError(null);
+    setCurrentPage(1);
+    setSort(nextSort);
     window.scrollTo(0, 0);
   }
 
@@ -97,6 +115,14 @@ function ListingsPage() {
       </header>
 
       <PropertyFilters onSearch={search} onClear={clearFilters} />
+
+      <div className="list-toolbar">
+        <SortControls
+          sortBy={sort.sortBy}
+          sortOrder={sort.sortOrder}
+          onChange={changeSort}
+        />
+      </div>
 
       {loading ? (
         <p className="status status--loading" role="status">Loading properties…</p>

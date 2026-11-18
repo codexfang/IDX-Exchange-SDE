@@ -220,4 +220,143 @@ describe("ListingsPage", () => {
 
     expect(screen.queryByRole("navigation", { name: "Pagination" })).not.toBeInTheDocument();
   });
+
+  describe("sorting", () => {
+    beforeEach(() => {
+      window.scrollTo = jest.fn();
+      fetchProperties.mockResolvedValue({ ...sample, total: 55212 });
+    });
+
+    it("sends the sort column and direction to the API", async () => {
+      renderListings();
+      await screen.findByText("1461 Laurel Way");
+
+      await userEvent.selectOptions(
+        screen.getByLabelText("Sort by"),
+        "Price: High to Low"
+      );
+
+      await waitFor(() =>
+        expect(fetchProperties).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            sortBy: "L_SystemPrice",
+            sortOrder: "desc",
+            offset: 0,
+          })
+        )
+      );
+    });
+
+    it("does not send sort parameters until a sort is chosen", async () => {
+      renderListings();
+      await screen.findByText("1461 Laurel Way");
+
+      expect(fetchProperties).toHaveBeenLastCalledWith({ limit: 20, offset: 0 });
+    });
+
+    it("keeps the sort when changing pages", async () => {
+      renderListings();
+      await screen.findByText("1461 Laurel Way");
+
+      await userEvent.selectOptions(
+        screen.getByLabelText("Sort by"),
+        "Price: Low to High"
+      );
+      await waitFor(() =>
+        expect(fetchProperties).toHaveBeenLastCalledWith(
+          expect.objectContaining({ sortBy: "L_SystemPrice", sortOrder: "asc" })
+        )
+      );
+      await screen.findByText("1461 Laurel Way");
+
+      await userEvent.click(screen.getByRole("button", { name: "Next" }));
+
+      await waitFor(() =>
+        expect(fetchProperties).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            sortBy: "L_SystemPrice",
+            sortOrder: "asc",
+            offset: 20,
+          })
+        )
+      );
+    });
+
+    it("returns to page 1 when the sort changes and scrolls to the top", async () => {
+      renderListings();
+      await screen.findByText("1461 Laurel Way");
+
+      await userEvent.click(screen.getByRole("button", { name: "Next" }));
+      await waitFor(() =>
+        expect(fetchProperties).toHaveBeenLastCalledWith(
+          expect.objectContaining({ offset: 20 })
+        )
+      );
+
+      await userEvent.selectOptions(
+        screen.getByLabelText("Sort by"),
+        "Beds: Most first"
+      );
+
+      await waitFor(() =>
+        expect(fetchProperties).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            sortBy: "L_Keyword2",
+            sortOrder: "desc",
+            offset: 0,
+          })
+        )
+      );
+      expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
+    });
+
+    it("resets the sort when new filters are applied", async () => {
+      renderListings();
+      await screen.findByText("1461 Laurel Way");
+
+      await userEvent.selectOptions(
+        screen.getByLabelText("Sort by"),
+        "Square footage: Largest first"
+      );
+      await waitFor(() =>
+        expect(fetchProperties).toHaveBeenLastCalledWith(
+          expect.objectContaining({ sortBy: "LM_Int2_3" })
+        )
+      );
+
+      await userEvent.type(screen.getByLabelText("City"), "Irvine");
+      await userEvent.click(screen.getByRole("button", { name: "Search" }));
+
+      await waitFor(() =>
+        expect(fetchProperties).toHaveBeenLastCalledWith({
+          city: "Irvine",
+          limit: 20,
+          offset: 0,
+        })
+      );
+      expect(screen.getByLabelText("Sort by")).toHaveValue("");
+    });
+
+    it("resets the sort when filters are cleared", async () => {
+      renderListings();
+      await screen.findByText("1461 Laurel Way");
+
+      await userEvent.selectOptions(
+        screen.getByLabelText("Sort by"),
+        "Date listed: Newest first"
+      );
+      await waitFor(() =>
+        expect(fetchProperties).toHaveBeenLastCalledWith(
+          expect.objectContaining({ sortBy: "ListingContractDate" })
+        )
+      );
+
+      await userEvent.click(screen.getByRole("button", { name: "Clear Filters" }));
+
+      await waitFor(() =>
+        expect(fetchProperties).toHaveBeenLastCalledWith({ limit: 20, offset: 0 })
+      );
+      expect(screen.getByLabelText("Sort by")).toHaveValue("");
+    });
+  });
 });

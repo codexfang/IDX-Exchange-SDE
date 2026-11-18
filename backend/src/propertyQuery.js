@@ -2,6 +2,20 @@ const MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 20;
 const MAX_LISTING_ID_LENGTH = 20;
 
+// Sort whitelist: sortBy values are the real column names in rets_property, not
+// RESO names. ListPrice, LivingArea and ListingContractDate-style RESO names do
+// not exist on this table, and sorting by one would either error or silently
+// return unsorted rows, so anything outside this map is rejected with a 400.
+const SORT_FIELDS = {
+  L_SystemPrice: "L_SystemPrice",
+  ListingContractDate: "ListingContractDate",
+  LM_Int2_3: "LM_Int2_3",
+  L_Keyword2: "L_Keyword2",
+};
+
+const SORT_ORDERS = ["asc", "desc"];
+const SORTABLE_FIELDS = Object.keys(SORT_FIELDS);
+
 const SELECT_COLUMNS = [
   "L_ListingID",
   "L_DisplayId",
@@ -19,6 +33,7 @@ const SELECT_COLUMNS = [
   "L_Photos",
   "LMD_MP_Latitude",
   "LMD_MP_Longitude",
+  "ListingContractDate",
   "L_Status",
   "StandardStatus",
   "SubdivisionName",
@@ -252,6 +267,28 @@ function validate(query) {
     else clean.offset = parsed.value;
   }
 
+  if (query.sortBy !== undefined) {
+    const sortBy = String(query.sortBy).trim();
+    if (!Object.prototype.hasOwnProperty.call(SORT_FIELDS, sortBy)) {
+      errors.push(`sortBy must be one of: ${SORTABLE_FIELDS.join(", ")}`);
+    } else {
+      clean.sortBy = sortBy;
+    }
+  }
+
+  if (query.sortOrder !== undefined) {
+    const sortOrder = String(query.sortOrder).trim().toLowerCase();
+    if (!SORT_ORDERS.includes(sortOrder)) {
+      errors.push("sortOrder must be asc or desc");
+    } else {
+      clean.sortOrder = sortOrder;
+    }
+  }
+
+  if (clean.sortBy === undefined && clean.sortOrder !== undefined) {
+    errors.push("sortOrder requires sortBy");
+  }
+
   if (errors.length > 0) {
     return { errors };
   }
@@ -292,19 +329,46 @@ function buildWhere(filters) {
     values.push(filters.baths);
   }
 
+  if (filters.sortBy !== undefined) {
+    // A row with no value for the sort column cannot be ordered, and pushing
+    // those rows to the end with an `IS NULL` sort key would stop MySQL from
+    // reading the column index in order (a 10s filesort instead of an index
+    // scan). Excluding them keeps the ordering fast and the total honest.
+    conditions.push(`${SORT_FIELDS[filters.sortBy]} IS NOT NULL`);
+  }
+
   return {
     where: conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "",
     values,
   };
 }
 
+// The column name is looked up in the whitelist and never interpolated from user
+// input, so the ORDER BY clause cannot carry SQL. The id tie-break uses the same
+// direction as the sort column: a mixed direction such as `price DESC, id ASC`
+// forces a filesort, while matching directions let MySQL walk the index
+// backwards instead. id keeps the order stable so paging cannot repeat or skip
+// rows that share the same price, date or square footage.
+function buildOrderBy({ sortBy, sortOrder } = {}) {
+  const column = sortBy ? SORT_FIELDS[sortBy] : null;
+
+  if (!column) return "ORDER BY id ASC";
+
+  const direction = sortOrder === "desc" ? "DESC" : "ASC";
+  return `ORDER BY ${column} ${direction}, id ${direction}`;
+}
+
 module.exports = {
   MAX_LIMIT,
   DEFAULT_LIMIT,
   MAX_LISTING_ID_LENGTH,
+  SORT_FIELDS,
+  SORTABLE_FIELDS,
+  SORT_ORDERS,
   SELECT_COLUMNS,
   DETAIL_COLUMNS,
   validate,
   validateListingId,
   buildWhere,
+  buildOrderBy,
 };

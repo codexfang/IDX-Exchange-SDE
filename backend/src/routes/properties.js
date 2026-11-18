@@ -5,6 +5,7 @@ const {
   DETAIL_COLUMNS,
   validate,
   buildWhere,
+  buildOrderBy,
   validateListingId,
 } = require("../propertyQuery");
 
@@ -34,6 +35,7 @@ router.get("/", async (req, res) => {
   }
 
   const { where, values } = buildWhere(clean);
+  const orderBy = buildOrderBy(clean);
 
   try {
     const countSql = `SELECT COUNT(*) AS total FROM rets_property ${where}`;
@@ -43,7 +45,7 @@ router.get("/", async (req, res) => {
       SELECT ${SELECT_COLUMNS}
       FROM rets_property
       ${where}
-      ORDER BY id
+      ${orderBy}
       LIMIT ? OFFSET ?
     `;
     const [rows] = await pool.query(dataSql, [...values, clean.limit, clean.offset]);
@@ -52,6 +54,8 @@ router.get("/", async (req, res) => {
       total: countRow.total,
       limit: clean.limit,
       offset: clean.offset,
+      sortBy: clean.sortBy ?? null,
+      sortOrder: clean.sortBy ? clean.sortOrder ?? "asc" : null,
       results: rows,
     });
   } catch (err) {

@@ -52,6 +52,23 @@ REACT_APP_GOOGLE_MAPS_API_KEY=your_key
 Restart `npm start` after editing `.env`. Without a key the detail page still
 works; it shows a note in place of the map and keeps the Get Directions link.
 
+## Sorting the listings
+
+The "Sort by" control under the filters sends `sortBy` and `sortOrder` to
+`GET /api/properties`. `sortBy` values are the real column names in
+`rets_property` — `L_SystemPrice`, `ListingContractDate`, `LM_Int2_3`,
+`L_Keyword2` — and `sortOrder` is `asc` or `desc`. Anything else is a 400, which
+is why the picker's values in `src/components/SortControls.js` must stay in step
+with the whitelist in `backend/src/propertyQuery.js`.
+
+Sorting resets to page 1 and is kept while paging, but a new filter search (or
+Clear Filters) returns to the default order. Rows that have no value for the
+sorted column are left out of a sorted result, so the "Showing X of Z" total
+matches the rows you can actually order.
+
+Sorting reads an index per column. If price sorting feels slow on a fresh
+database, add the indexes in `backend/sql/indexes.sql`.
+
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
