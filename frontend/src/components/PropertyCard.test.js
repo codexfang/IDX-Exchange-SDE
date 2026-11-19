@@ -27,7 +27,7 @@ const baseProperty = {
 
 function renderCard(property = baseProperty) {
   return render(
-    <MemoryRouter>
+    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <PropertyCard property={property} />
     </MemoryRouter>
   );
@@ -128,7 +128,10 @@ describe("PropertyCard", () => {
       }
 
       return render(
-        <MemoryRouter initialEntries={["/"]}>
+        <MemoryRouter
+          initialEntries={["/"]}
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
           <PropertyCard property={property} />
           <PathSpy />
         </MemoryRouter>

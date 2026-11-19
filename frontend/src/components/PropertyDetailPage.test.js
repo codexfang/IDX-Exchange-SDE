@@ -47,7 +47,10 @@ const openHouse = {
 
 function renderDetail(id = "1118422731") {
   return render(
-    <MemoryRouter initialEntries={[`/property/${id}`]}>
+    <MemoryRouter
+      initialEntries={[`/property/${id}`]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <Routes>
         <Route path="/property/:id" element={<PropertyDetailPage />} />
         <Route path="/" element={<p>Listings page</p>} />
@@ -71,9 +74,14 @@ describe("PropertyDetailPage", () => {
     else process.env.REACT_APP_GOOGLE_MAPS_API_KEY = originalKey;
   });
 
-  it("shows a loading state first", () => {
+  it("shows a loading state first", async () => {
     renderDetail();
     expect(screen.getByText(/loading property/i)).toBeInTheDocument();
+
+    // The mocked requests resolve a tick later. Waiting for the loaded page
+    // keeps that state update inside the test's async act(), which is what
+    // silences React's "not wrapped in act(...)" warning.
+    expect(await screen.findByText("$3,950,000")).toBeInTheDocument();
   });
 
   it("renders the price, address and location", async () => {

@@ -309,6 +309,66 @@ h1 {
   filter: brightness(0.95);
 }
 
+.error-boundary {
+  max-width: 640px;
+  margin: 48px auto;
+  padding: 28px 32px;
+}
+
+.error-title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: var(--danger);
+}
+
+.error-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.error-retry {
+  height: 38px;
+  padding: 0 18px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.error-retry:hover {
+  filter: brightness(0.95);
+}
+
+.error-retry:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.error-home {
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.error-detail {
+  margin: 18px 0 0;
+  padding: 12px;
+  max-height: 220px;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid #fecdca;
+  border-radius: 8px;
+  color: #7a271a;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
 .back-link {
   color: var(--accent);
   font-size: 14px;

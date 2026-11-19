@@ -32,7 +32,7 @@ const sample = {
 
 function renderListings() {
   return render(
-    <MemoryRouter>
+    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ListingsPage />
     </MemoryRouter>
   );

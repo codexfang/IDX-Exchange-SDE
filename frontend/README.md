@@ -86,6 +86,20 @@ One store backs every consumer, so saving from a card updates the count in the
 header and the favorites page at the same time. Changes made in another tab are
 picked up through the `storage` event.
 
+## When something goes wrong
+
+A render error anywhere in the app shows a recovery panel — "Something went wrong"
+with a **Try again** button and a link back to the listings — instead of a blank
+white page. `src/components/ErrorBoundary.js` is mounted twice: once around the
+router in `src/index.js` and once inside it in `src/App.js`, so a crash in the
+listings can no longer take the header or navigation down with it. Saved
+favorites are in localStorage and survive the crash.
+
+The bundle is warning-clean. The React Router v7 future flags
+(`v7_startTransition`, `v7_relativeSplatPath`) are switched on where the router is
+created, in `App.js` and in the test renders, which is why `npm test` prints no
+`Future Flag Warning` or `not wrapped in act(...)` lines.
+
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
