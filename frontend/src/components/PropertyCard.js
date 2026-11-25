@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { formatBaths, formatCount, formatPrice } from "../utils/format";
 import { useFavorites } from "../hooks/useFavorites";
@@ -68,5 +69,29 @@ function PropertyCard({ property }) {
     </Link>
   );
 }
+
+const listingIdType = PropTypes.oneOfType([
+  PropTypes.string,
+  PropTypes.number,
+]);
+
+// RETS records mix strings and numbers between feeds, so scalar fields accept
+// either and are formatted at render time.
+PropertyCard.propTypes = {
+  property: PropTypes.shape({
+    id: listingIdType,
+    L_ListingID: listingIdType,
+    L_Address: PropTypes.string,
+    L_City: PropTypes.string,
+    L_State: PropTypes.string,
+    L_Zip: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    L_Status: PropTypes.string,
+    L_SystemPrice: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    L_Keyword2: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    LM_Dec_3: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    LM_Int2_3: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    L_Photos: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+  }).isRequired,
+};
 
 export default PropertyCard;
