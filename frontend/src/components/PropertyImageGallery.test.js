@@ -71,8 +71,8 @@ describe("PropertyImageGallery", () => {
   it("closes the lightbox when Escape is pressed", () => {
     renderGallery();
 
-    openLightbox();
-    fireEvent.keyDown(document.activeElement, { key: "Escape" });
+    const dialog = openLightbox();
+    fireEvent.keyDown(dialog, { key: "Escape" });
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
@@ -80,14 +80,14 @@ describe("PropertyImageGallery", () => {
   it("navigates photos with the arrow keys while the lightbox is open", () => {
     renderGallery();
 
-    openLightbox();
-    fireEvent.keyDown(document.activeElement, { key: "ArrowRight" });
+    const dialog = openLightbox();
+    fireEvent.keyDown(dialog, { key: "ArrowRight" });
 
     expect(
       screen.getByAltText("1461 Laurel Way — full-screen view 2")
     ).toBeInTheDocument();
 
-    fireEvent.keyDown(document.activeElement, { key: "ArrowLeft" });
+    fireEvent.keyDown(dialog, { key: "ArrowLeft" });
     expect(
       screen.getByAltText("1461 Laurel Way — full-screen view 1")
     ).toBeInTheDocument();
