@@ -59,9 +59,7 @@ describe("ListingsPage", () => {
       resolve(sample);
     });
 
-    await waitFor(() =>
-      expect(screen.getByText("1461 Laurel Way")).toBeInTheDocument()
-    );
+    expect(await screen.findByText("1461 Laurel Way")).toBeInTheDocument();
   });
 
   it("renders the property grid and the result count", async () => {
@@ -69,9 +67,7 @@ describe("ListingsPage", () => {
 
     renderListings();
 
-    await waitFor(() =>
-      expect(screen.getByText("1461 Laurel Way")).toBeInTheDocument()
-    );
+    expect(await screen.findByText("1461 Laurel Way")).toBeInTheDocument();
 
     expect(screen.getByText("Showing 1-1 of 55,212 properties")).toBeInTheDocument();
   });
@@ -81,9 +77,7 @@ describe("ListingsPage", () => {
 
     renderListings();
 
-    await waitFor(() =>
-      expect(screen.getByRole("alert")).toBeInTheDocument()
-    );
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
 
     expect(screen.getByText("Could not load properties")).toBeInTheDocument();
     expect(screen.getByText("Could not reach the server.")).toBeInTheDocument();
@@ -156,9 +150,9 @@ describe("ListingsPage", () => {
 
     renderListings();
 
-    await waitFor(() =>
-      expect(screen.getByText(/no properties matched/i)).toBeInTheDocument()
-    );
+    expect(
+      await screen.findByText(/no properties matched/i)
+    ).toBeInTheDocument();
   });
 
   it("requests the next page with the right offset and scrolls to top", async () => {

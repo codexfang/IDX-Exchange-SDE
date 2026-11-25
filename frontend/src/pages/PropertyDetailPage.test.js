@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import PropertyDetailPage from "./PropertyDetailPage";
@@ -97,10 +97,11 @@ describe("PropertyDetailPage", () => {
 
     await screen.findByText("$3,950,000");
 
-    expect(screen.getByText("Beds").nextSibling).toHaveTextContent("4");
-    expect(screen.getByText("Baths").nextSibling).toHaveTextContent("5");
-    expect(screen.getByText("Sq Ft").nextSibling).toHaveTextContent("3,677");
-    expect(screen.getByText("Year built").nextSibling).toHaveTextContent("1998");
+    const stats = screen.getByRole("region", { name: "Property stats" });
+    expect(stats).toHaveTextContent("Beds4");
+    expect(stats).toHaveTextContent("Baths5");
+    expect(stats).toHaveTextContent("Sq Ft3,677");
+    expect(stats).toHaveTextContent("Year built1998");
   });
 
   it("renders the description and property details", async () => {
@@ -151,9 +152,9 @@ describe("PropertyDetailPage", () => {
     renderDetail();
 
     expect(await screen.findByText("$3,950,000")).toBeInTheDocument();
-    await waitFor(() =>
-      expect(screen.getByText("No open houses scheduled")).toBeInTheDocument()
-    );
+    expect(
+      await screen.findByText("No open houses scheduled")
+    ).toBeInTheDocument();
   });
 
   it("shows an error for an unknown listing instead of crashing", async () => {
