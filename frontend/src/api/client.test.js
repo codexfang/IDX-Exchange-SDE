@@ -83,13 +83,10 @@ describe("api client", () => {
       text: async () => JSON.stringify({ error: "Internal server error" }),
     });
 
-    try {
-      await fetchProperties();
-      throw new Error("expected a rejection");
-    } catch (err) {
-      expect(err).toBeInstanceOf(ApiError);
-      expect(err.status).toBe(500);
-    }
+    const error = await fetchProperties().catch((err) => err);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error.status).toBe(500);
   });
 
   it("gives an actionable message when the API returns a 5xx", async () => {

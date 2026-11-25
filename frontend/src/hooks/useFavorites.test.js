@@ -177,22 +177,22 @@ describe("useFavorites", () => {
   });
 
   it("keeps every component that uses the hook in sync", () => {
-    const first = renderHook(() => useFavorites());
-    const second = renderHook(() => useFavorites());
+    const { result: first } = renderHook(() => useFavorites());
+    const { result: second } = renderHook(() => useFavorites());
 
     act(() => {
-      first.result.current.toggleFavorite(property);
+      first.current.toggleFavorite(property);
     });
 
-    expect(first.result.current.count).toBe(1);
-    expect(second.result.current.count).toBe(1);
-    expect(second.result.current.isFavorite("1118422731")).toBe(true);
+    expect(first.current.count).toBe(1);
+    expect(second.current.count).toBe(1);
+    expect(second.current.isFavorite("1118422731")).toBe(true);
 
     act(() => {
-      second.result.current.removeFavorite("1118422731");
+      second.current.removeFavorite("1118422731");
     });
 
-    expect(first.result.current.count).toBe(0);
+    expect(first.current.count).toBe(0);
   });
 
   it("picks up a change made in another tab", () => {
