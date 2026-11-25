@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { fetchProperties } from "../api/client";
-import PropertyCard from "./PropertyCard";
-import PropertyFilters from "./PropertyFilters";
-import Pagination from "./Pagination";
-import SortControls from "./SortControls";
-import FavoritesLink from "./FavoritesLink";
+import PropertyCard from "../components/PropertyCard";
+import PropertyFilters from "../components/PropertyFilters";
+import Pagination from "../components/Pagination";
+import SortControls from "../components/SortControls";
+import FavoritesLink from "../components/FavoritesLink";
 
 const PAGE_SIZE = 20;
 const DEFAULT_SORT = { sortBy: null, sortOrder: null };

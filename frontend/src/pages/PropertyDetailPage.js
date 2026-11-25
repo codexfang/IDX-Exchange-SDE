@@ -6,9 +6,9 @@ import {
   formatCount,
   formatPrice,
 } from "../utils/format";
-import OpenHouses from "./OpenHouses";
-import PropertyImageGallery from "./PropertyImageGallery";
-import PropertyMap from "./PropertyMap";
+import OpenHouses from "../components/OpenHouses";
+import PropertyImageGallery from "../components/PropertyImageGallery";
+import PropertyMap from "../components/PropertyMap";
 
 function yesNo(value) {
   if (value === true || value === 1 || value === "1" || value === "Yes") return "Yes";

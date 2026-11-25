@@ -1,10 +1,10 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import FavoritesPage from "./components/FavoritesPage";
+import FavoritesPage from "./pages/FavoritesPage";
 import ErrorBoundary from "./components/ErrorBoundary";
-import ListingsPage from "./components/ListingsPage";
-import PropertyDetailPage from "./components/PropertyDetailPage";
+import ListingsPage from "./pages/ListingsPage";
+import PropertyDetailPage from "./pages/PropertyDetailPage";
 
 function App() {
   return (
