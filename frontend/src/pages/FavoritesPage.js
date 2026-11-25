@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useFavorites } from "../hooks/useFavorites";
-import PropertyCard from "./PropertyCard";
+import PropertyCard from "../components/PropertyCard";
 
 function FavoritesPage() {
   const { favorites, count } = useFavorites();
